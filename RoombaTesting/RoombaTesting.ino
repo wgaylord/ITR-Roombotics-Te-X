@@ -15,47 +15,23 @@ void setup(){
   roombaSerial.write(132);
   
   roombaSerial.write(139); //LEDS
-  roombaSerial.print(63);
   roombaSerial.print(0);
+  roombaSerial.print(1);
   roombaSerial.write(255);
+  
+  delay(20000);
 
-Serial.println("READY!");
+
   
  
 }
 void loop()
 {
-if (Serial.available() > 0) {
-                // read the incoming byte:
-                incomingByte = Serial.read();
-                if(incomingByte == 119 ){
-                Serial.println("Forward"); //W
-                drive(500, 32768);
-                delay(50);
-                drive(0,0);
-                }
-                if(incomingByte == 97 ){ //A
-                Serial.println("Left");
-                drive(500,1);
-                delay(50);
-                drive(0,0);
-                
-                }
-                if(incomingByte == 115 ){ //S
-                Serial.println("Backward");
-                drive( -500, 32768);
-                delay(50);
-                drive(0,0);
-                }
-                if(incomingByte == 100 ){ //D
-                Serial.println("Right");
-                drive(500,-1);
-                delay(50);
-                drive(0,0);
-                }
-                
-        }
-  
+  drive(500, 32768);
+  delay(1000);
+  drive(500, 1);
+  delay(300);
+
  
 }
 
