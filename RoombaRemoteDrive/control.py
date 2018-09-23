@@ -7,13 +7,13 @@ def sendPacket(byte): #user defines packet
 
     for i in packet: #probably a better way to do this
         elements = [i]
-        print( bytes(elements))
+        #print( bytes(elements))
         ser.write(bytes(elements)) #sends packets over xbee
     time.sleep(.005); #wait a bit between sending
 
     return;
 
-ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=1) #this is the port for your xbee
+ser = serial.Serial('COM4', 57600, timeout=1) #this is the port for your xbee
 
 
 pygame.joystick.init() 
@@ -29,41 +29,32 @@ button = []
 
 for i in range(12):#create an array to put button values in
     button.append(0)
+    
+    
+joystick = pygame.joystick.Joystick(0)
+joystick.init()
 
 
+        
 while done==False:
     for event in pygame.event.get(): #whenever we quit pygame pygame will end
         if event.type == pygame.QUIT:
             done=True
 
-    joystick_count = pygame.joystick.get_count() #we find out how many joysticks are plugged in
+  
 
-    for i in range(joystick_count): #take that num and iterate through joysticks to get their data
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
-        buttonPacket = 0
-        for j in range(5): #send the first few values of buttons (adding more and decreasing the delay on sending packets seems to make recieved packets less accurate)
-            buttonPacket = (buttonPacket<<1)+joystick.get_button(j)
-           
-           
-        sendPacket(((2)<<5)+buttonPacket)
-        print(buttonPacket)
-            
-
-        
-
-        Xaxis = round(joystick.get_axis(0) * 15 + 15) #this should be the "drone" setup for X and Y axes.  The last joystick found is the primary
-        Yaxis = round(joystick.get_axis(3)* 15 + 15)
+    Xaxis = int(round(joystick.get_axis(0) * 15 + 15)) #this should be the "drone" setup for X and Y axes.  The last joystick found is the primary
+    Yaxis = int(round(joystick.get_axis(3)* 15 + 15))
 
         #The joystick axis are indexed at 0, so Left X = 0, Left Y = 1, Right X = 2, Right Y = 3 and so on if you have more
 
-        print("X axis = " + str(Xaxis) + " Y axis = " + str(Yaxis))
+        #print("X axis = " + str(Xaxis) + " Y axis = " + str(Yaxis))
+    ser.write([chr(Xaxis),chr(Yaxis)])
 
-        packet = [Xaxis, Yaxis + ( 1 << 5)] #now we will send this packet over to the arduino
-        sendPacket(Xaxis)
-        sendPacket(Yaxis + (1 << 5))
-        time.sleep(.05)     #delay is needed for accuracy on arduino 
-
+    time.sleep(0.07)
+    #delay is needed for accuracy on arduino 
+        #print ser.readline()
+       
 
 
 
