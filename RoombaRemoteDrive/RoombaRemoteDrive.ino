@@ -13,6 +13,8 @@ int Xaxis = 0; //This value represents the recieved X value (0 to 30)
 int Yaxis = 0; //This value represents the recieved Y value
 int inNum; //This holds the recieved byte from the Xbee
 
+bool Active = true;
+
 void setup() {  
   Serial.begin(57600);          //this Serial line will read data from the xbee
   roombaSerial.begin(57600);    //this Serial line will send commands to the roomba
@@ -37,11 +39,24 @@ void loop() {
     
     Xaxis = Serial.read();  //get the value
     Yaxis = Serial.read();
-    Serial.println(Xaxis,DEC);
-    Serial.println(Yaxis,DEC);  
+    if(Xaxis == 255){
+        Active = false;
+        roombaSerial.write(139); //LEDS
+        roombaSerial.print(0);
+        roombaSerial.print(255);
+        roombaSerial.write(255);
+    }    
+    if(Yaxis == 255){
+        Active = true;
+        roombaSerial.write(139); //LEDS
+        roombaSerial.print(0);
+        roombaSerial.print(1);
+        roombaSerial.write(255);
+    }    
     
-  
+    if(Active){
     driveRoomba(Xaxis, Yaxis, 13,17); //This method takes the current X and Y value of the remote and translates it into Roomba motion.
+    }
   }
 
 }
