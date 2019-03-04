@@ -3,8 +3,7 @@ import serial
 import time #These are the required libraries (make sure they are installed)
 
 
-
-ser = serial.Serial('COM4', 57600, timeout=1) #this is the port for your xbee
+ser = serial.Serial('COM6', 57600, timeout=1) #this is the port for your xbee
 
 
 pygame.joystick.init() 
@@ -14,15 +13,11 @@ joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_coun
 pygame.init()
 pygame.joystick.init()
 done = False
-Active = True
-Xaxis = 15
-Yaxis = 15
-button = []
+Xaxis = 0
+Yaxis = 0
+button = ""
 
-for i in range(12):#create an array to put button values in
-    button.append(0)
-    
-    
+
 joystick = pygame.joystick.Joystick(0)
 joystick.init()
 
@@ -32,22 +27,31 @@ while done==False:
     for event in pygame.event.get(): #whenever we quit pygame pygame will end
         if event.type == pygame.QUIT:
             done=True
-        if event.type == pygame.JOYAXISMOTION: # Only update the bot if we have to.
-            if event.axis == 0:
-                Xaxis = int(round(event.value * 15 + 15))
-            if event.axis == 3:
-                Yaxis = int(round(event.value * 15 + 15))
-            ser.write([chr(Xaxis),chr(Yaxis)])
-        if event.type == pygame.JOYBUTTONDOWN:
-            if event.button == 1:
-                ser.write([Active*255,(!Active*)255])
-                Active = !Active
-                
-                
+        
+    button = 0
+    
 
-    time.sleep(0.005)
-   
+    Xaxis = int(round(joystick.get_axis(0) * -15 + 15)) 
+    Yaxis = int(round(joystick.get_axis(3) * -15 + 15))
+    
+    
+    if joystick.get_button(7) == 1:
+        button = 127
+    if joystick.get_button(5) == 1:
+        button = 64
+    if joystick.get_button(2) == 1:
+        button = 32
+    if joystick.get_button(0) == 1:
+        button = 16
+    if joystick.get_button(1) == 1:
+        button = 75
+    print "Sent",Xaxis,Yaxis,button
+    ser.write([chr(Xaxis),chr(Yaxis),chr(button)])
+    try:
+        print "Returned",ord(ser.read()),ord(ser.read()),ord(ser.read())
+    except:
+        print "Arduino Timed out. Waiting for watchdog reset"
+    
        
-
 
 
